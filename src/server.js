@@ -5,9 +5,8 @@ import morgan from "morgan";
 import connectDB from "./config/connectDB.js";
 
 dotenv.config();
-const app = express();
 
-connectDB();
+const app = express();
 
 app.use(express.json());
 
@@ -17,6 +16,17 @@ app.use(express.static("public"));
 
 app.use("/api", router);
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 3000}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Không thể khởi động server:", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();

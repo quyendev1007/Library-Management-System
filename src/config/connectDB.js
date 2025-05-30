@@ -1,11 +1,20 @@
 import mongoose from "mongoose";
 
+let isConnected = false;
+
 const connectDB = async () => {
+  if (isConnected) {
+    console.log("Đã kết nối MongoDB trước đó.");
+    return;
+  }
+
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log("Ket noi Db thanh cong");
+
+    isConnected = true;
+    console.log("Kết nối MongoDB thành công.");
   } catch (error) {
-    console.error("Lỗi kết nối MongoDb", error.message);
+    console.error("Lỗi kết nối MongoDB:", error.message);
     process.exit(1);
   }
 };
