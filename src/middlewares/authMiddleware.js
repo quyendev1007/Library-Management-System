@@ -1,14 +1,31 @@
-import jwt from "jsonwebtoken";
+import { StatusCodes } from "http-status-codes";
+import { verifyToken } from "../providers/jwtProvider";
 
-export const verifyJWT = (req, res, next) => {
+export const isAuthorized = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Access Denied" });
+
+  console.log(`Token: ${token}`);
+
+  if (!token)
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: "Access Denied" });
 
   try {
-    const decoded = jwt.verify(token, "123456");
-    req.user = decoded;
+    const jwtDecoded = await verifyToken(
+      token,
+      process.env.ACCESS_TOKEN_SECRET_SIGNATURE
+    );
+
+    req.jwtDecoded = jwtDecoded;
     next();
   } catch (err) {
-    res.status(403).json({ message: "Token không hợp lệ" });
+    if (err?.message?.includes("jwt expired")) {
+      res.status(StatusCodes.GONE).json({ message: "Need to refresh token" });
+    }
+
+    res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: "Token không hợp lệ" });
   }
 };
