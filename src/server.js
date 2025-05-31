@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import router from "./routes";
 import morgan from "morgan";
 import connectDB from "./config/connectDB";
+import { errorHandlingMiddleware } from "./middlewares/errorHandlingMiddleware";
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 
 app.use("/api", router);
+
+app.use(errorHandlingMiddleware);
 
 const startServer = async () => {
   try {
