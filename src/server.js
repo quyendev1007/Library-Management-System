@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import router from "./routes";
 import morgan from "morgan";
-import connectDB from "./config/connectDB.js";
+import connectDB from "./config/connectDB";
 
 dotenv.config();
 
