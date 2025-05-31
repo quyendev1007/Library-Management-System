@@ -23,7 +23,7 @@ export const registerSchema = Joi.object({
     .messages({
       "string.pattern.base": "Số điện thoại phải có đúng 10 chữ số",
     }),
-  role: Joi.string().valid("customer", "staff", "admin").default("customer"),
+  role: Joi.string().valid("client", "admin").default("client"),
   addresses: Joi.array().items(
     Joi.object({
       street: Joi.string().required(),
