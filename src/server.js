@@ -1,18 +1,18 @@
 import express from "express";
 import dotenv from "dotenv";
-import router from "./routes";
 import morgan from "morgan";
-import connectDB from "./config/connectDB";
-import { errorHandlingMiddleware } from "./middlewares/errorHandlingMiddleware";
+import path from "path";
+
+import connectDB from "./config/connectDB.js";
+import { errorHandlingMiddleware } from "./middlewares/errorHandlingMiddleware.js";
+import router from "./routes/index.js";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-
 app.use(morgan("dev"));
-
 app.use(express.static("public"));
 
 app.use("/api", router);
