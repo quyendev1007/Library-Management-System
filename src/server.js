@@ -1,18 +1,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
-import path from "path";
-
 import connectDB from "./config/connectDB.js";
 import { errorHandlingMiddleware } from "./middlewares/errorHandlingMiddleware.js";
 import router from "./routes/index.js";
+import cors from "cors";
+import { corsOptions } from "./config/cors.js";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
+
+app.use(cors(corsOptions));
+
 app.use(morgan("dev"));
+
 app.use(express.static("public"));
 
 app.use("/api", router);

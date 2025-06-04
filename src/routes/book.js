@@ -8,10 +8,12 @@ import {
 } from "../controllers/booksControllers.js";
 import { isAuthorized } from "../middlewares/authMiddleware.js";
 import { isValidPermission } from "../middlewares/rbacMiddleware.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { bookSchema } from "../validations/bookValidation.js";
 
 const bookRouter = Router();
 
-bookRouter.get("/all", getAllBooks);
+bookRouter.get("/", getAllBooks);
 
 bookRouter.get("/:id", getBookById);
 
