@@ -1,49 +1,31 @@
 import mongoose from "mongoose";
 
-export const BookSchema = new mongoose.Schema(
+const BookSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: [true, "Vui lòng cung cấp tên sách"],
       trim: true,
     },
+    image: [
+      {
+        type: String,
+        required: [true, "Vui lòng cung cấp hình ảnh sách"],
+      },
+    ],
     description: {
       type: String,
       trim: true,
     },
-    author: {
-      type: String,
-      required: [true, "Vui lòng cung cấp tên tác giả"],
-      trim: true,
-    },
-    publisher: {
-      type: String,
-      required: [true, "Vui lòng cung cấp nhà xuất bản"],
-      trim: true,
-    },
-    publishYear: {
+    author: { type: mongoose.Schema.Types.ObjectId, ref: "Author" },
+    publisher: { type: mongoose.Schema.Types.ObjectId, ref: "Publisher" },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+    quantity: Number,
+    available: Number,
+    publishedYear: {
       type: Number,
       required: [true, "Vui lòng cung cấp năm xuất bản"],
       min: [1000, "Năm xuất bản không hợp lệ"],
-    },
-    category: {
-      type: String,
-      trim: true,
-      default: "Chưa phân loại",
-    },
-    available: {
-      type: Boolean,
-      default: true,
-    },
-    totalCopies: {
-      type: Number,
-      default: 1,
-      min: [0, "Số lượng phải lớn hơn hoặc bằng 0"],
-    },
-    borrowedCopies: {
-      type: Number,
-      default: 0,
-      min: [0, "Số lượng mượn không hợp lệ"],
     },
   },
   {
