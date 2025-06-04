@@ -5,57 +5,23 @@ import {
   createBook,
   updateBook,
   deleteBook,
-} from "../controllers/BooksControllers.js";
+} from "../controllers/booksControllers.js";
 import { isAuthorized } from "../middlewares/authMiddleware.js";
 import { isValidPermission } from "../middlewares/rbacMiddleware.js";
 
 const bookRouter = Router();
 
-bookRouter.get(
-  "/",
-  isAuthorized,
-  isValidPermission(["admin", "client"]),
-  (req, res) => {
-    res.status(200).json({
-      message: "Welcome to the Book API",
-      version: "1.0.0",
-    });
-  }
-);
+bookRouter.get("/all", getAllBooks);
 
-bookRouter.get(
-  "/all",
-  isAuthorized,
-  isValidPermission(["admin", "client"]),
-  getAllBooks
-);
+bookRouter.get("/:id", getBookById);
 
-bookRouter.get(
-  "/:id",
-  isAuthorized,
-  isValidPermission(["admin", "client"]),
-  getBookById
-);
+// bookRouter.use(isAuthorized);
+// bookRouter.use(isValidPermission("admin"));
 
-bookRouter.post(
-  "/",
-  isAuthorized,
-  isValidPermission(["admin"]),
-  createBook
-);
+bookRouter.post("/", createBook);
 
-bookRouter.put(
-  "/:id",
-  isAuthorized,
-  isValidPermission(["admin"]),
-  updateBook
-);
+bookRouter.put("/:id", updateBook);
 
-bookRouter.delete(
-  "/:id",
-  isAuthorized,
-  isValidPermission(["admin"]),
-  deleteBook
-);
+bookRouter.delete("/:id", deleteBook);
 
 export default bookRouter;
