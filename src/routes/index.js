@@ -2,6 +2,7 @@ import { Router } from "express";
 import bookRouter from "./book";
 import authRouter from "./auth";
 import authorRouter from "./author";
+import publisherRouter from "./publisher"
 
 const router = Router();
 
@@ -11,5 +12,6 @@ router.use("/auth", authRouter);
 router.use("/books", bookRouter);
 
 router.use("/authors", authorRouter);
+router.use("/publishers", publisherRouter);
 
 export default router;
