@@ -272,7 +272,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8017/api/authors/",
+							"raw": "http://localhost:8017/api/authors/684189fbee506e2559eb5ae2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -281,7 +281,7 @@
 							"path": [
 								"api",
 								"authors",
-								""
+								"684189fbee506e2559eb5ae2"
 							]
 						}
 					},
@@ -292,6 +292,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"quyen bv\",\r\n    \"bio\": \"quyen dep dai\",\r\n    \"dateOfBirth\": \"2/4/2000\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:8017/api/authors",
 							"protocol": "http",
@@ -312,8 +321,17 @@
 					"request": {
 						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"quyen bv update\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://localhost:8017/api/authors/:id",
+							"raw": "http://localhost:8017/api/authors/684189fbee506e2559eb5ae2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -322,6 +340,63 @@
 							"path": [
 								"api",
 								"authors",
+								"684189fbee506e2559eb5ae2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete author",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8017/api/authors/684189fbee506e2559eb5ae2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8017",
+							"path": [
+								"api",
+								"authors",
+								"684189fbee506e2559eb5ae2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "publishers",
+			"item": [
+				{
+					"name": "get publishers by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8017/api/publishers/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8017",
+							"path": [
+								"api",
+								"publishers",
 								":id"
 							],
 							"variable": [
@@ -335,12 +410,12 @@
 					"response": []
 				},
 				{
-					"name": "delete author",
+					"name": "create new publishers",
 					"request": {
-						"method": "DELETE",
+						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8017/api/authors/:id",
+							"raw": "http://localhost:8017/api/publishers",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -348,7 +423,54 @@
 							"port": "8017",
 							"path": [
 								"api",
-								"authors",
+								"publishers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update publishers",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8017/api/publishers/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8017",
+							"path": [
+								"api",
+								"publishers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete publishers",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8017/api/publishers/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8017",
+							"path": [
+								"api",
+								"publishers",
 								":id"
 							],
 							"variable": [
