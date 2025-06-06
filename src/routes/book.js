@@ -14,16 +14,14 @@ import { bookSchema } from "../validations/bookValidation.js";
 const bookRouter = Router();
 
 bookRouter.get("/", getAllBooks);
-
 bookRouter.get("/:id", getBookById);
 
 // bookRouter.use(isAuthorized);
 // bookRouter.use(isValidPermission("admin"));
+// bookRouter.use(validateRequest(bookSchema));
 
 bookRouter.post("/", createBook);
-
 bookRouter.put("/:id", updateBook);
-
 bookRouter.delete("/:id", deleteBook);
 
 export default bookRouter;
