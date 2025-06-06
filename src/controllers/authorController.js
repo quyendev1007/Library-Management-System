@@ -1,6 +1,17 @@
 import { StatusCodes } from "http-status-codes";
 import Author from "../models/author.js";
 
+const getAllAuthors = async (req, res) => {
+  try {
+    const authors = await Author.find();
+    res.status(StatusCodes.OK).json(authors);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Không có tác giả!", error: error.message });
+  }
+};
+
 const getAuthorById = async (req, res) => {
   try {
     const author = await Author.findById(req.params.id);

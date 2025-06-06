@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import { User } from "../models/user";
-import jwt from "jsonwebtoken";
 import { pickUser } from "../utils/formatters";
 import { generateToken } from "../providers/jwtProvider";
 import { StatusCodes } from "http-status-codes";
