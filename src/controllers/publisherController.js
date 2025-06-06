@@ -1,4 +1,4 @@
-import Publisher from "../models/publisherModel.js"; // Điều chỉnh path nếu cần
+import Publisher from "../models/publisher.js"; // Điều chỉnh path nếu cần
 
 // Hiển thị nhà xuất bản
 export const getAllPublishers = async (req, res) => {
@@ -6,7 +6,9 @@ export const getAllPublishers = async (req, res) => {
     const publishers = await Publisher.find();
     res.status(200).json(publishers);
   } catch (error) {
-    res.status(500).json({ message: "Không có nhà xuất bản!", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Không có nhà xuất bản!", error: error.message });
   }
 };
 // Hiển thị nhà xuất bản theo id
@@ -18,7 +20,9 @@ export const getPublisherById = async (req, res) => {
     }
     res.status(200).json(publisher);
   } catch (error) {
-    res.status(500).json({ message: "Không có nhà xuất bản!", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Không có nhà xuất bản!", error: error.message });
   }
 };
 
@@ -29,7 +33,9 @@ export const createPublisher = async (req, res) => {
     const savedPublisher = await publisher.save();
     res.status(201).json(savedPublisher);
   } catch (error) {
-    res.status(400).json({ message: "Thêm không thành công!", error: error.message });
+    res
+      .status(400)
+      .json({ message: "Thêm không thành công!", error: error.message });
   }
 };
 
