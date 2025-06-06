@@ -2,6 +2,17 @@ import { StatusCodes } from "http-status-codes";
 import Category from "../models/category.js";
 import Book from "../models/books.js";
 
+export const getAllCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    res.status(200).json(categories);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Không có nhà xuất bản!", error: error.message });
+  }
+};
+
 export const getCategoryById = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -21,14 +32,14 @@ export const getCategoryById = async (req, res) => {
 
 export const createCategory = async (req, res) => {
   try {
-    const newcategory = await new Category(req.body).save();
+    const newCategory = await new Category(req.body).save();
 
-    if (!newcategory)
+    if (!newCategory)
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Có lỗi xảy ra, vui lòng thử lại sau ít phút." });
 
-    res.status(StatusCodes.CREATED).json(newcategory);
+    res.status(StatusCodes.CREATED).json(newCategory);
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
