@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { getCurrentUser, login, register } from "../controllers/auth";
+import {
+  getCurrentUser,
+  login,
+  register,
+  logout,
+  refreshToken,
+} from "../controllers/auth";
 import { validateRequest } from "../middlewares/validateRequest";
 import { loginSchema, registerSchema } from "../validations/auth";
 import { isAuthorized } from "../middlewares/authMiddleware";
@@ -10,6 +16,10 @@ const authRouter = Router();
 authRouter.route("/register").post(validateRequest(registerSchema), register);
 
 authRouter.route("/login").post(validateRequest(loginSchema), login);
+
+authRouter.route("/logout").post(logout);
+
+authRouter.route("/refresh-token").post(refreshToken);
 
 authRouter
   .route("/getCurrentUser")

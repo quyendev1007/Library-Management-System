@@ -2,18 +2,19 @@ import { StatusCodes } from "http-status-codes";
 import { verifyToken } from "../providers/jwtProvider";
 
 export const isAuthorized = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  // const token = req.headers.authorization?.split(" ")[1];
 
-  console.log(`Token: ${token}`);
+  const clientAccessToken =
+    req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
 
-  if (!token)
+  if (!clientAccessToken)
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: "Access Denied" });
 
   try {
     const jwtDecoded = await verifyToken(
-      token,
+      clientAccessToken,
       process.env.ACCESS_TOKEN_SECRET_SIGNATURE
     );
 
