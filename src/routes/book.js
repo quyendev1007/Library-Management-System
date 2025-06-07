@@ -5,7 +5,7 @@ import {
   createBook,
   updateBook,
   deleteBook,
-} from "../controllers/booksControllers.js";
+} from "../controllers/BooksControllers.js";
 import { isAuthorized } from "../middlewares/authMiddleware.js";
 import { isValidPermission } from "../middlewares/rbacMiddleware.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
