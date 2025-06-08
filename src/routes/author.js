@@ -9,6 +9,7 @@ const authorRouter = Router();
 
 authorRouter
   .route("/")
+  .get(authorController.getAllAuthors)
   .post(validateRequest(authorSchema), authorController.createAuthor);
 
 authorRouter

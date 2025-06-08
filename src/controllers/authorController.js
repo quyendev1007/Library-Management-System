@@ -3,8 +3,33 @@ import Author from "../models/author.js";
 
 const getAllAuthors = async (req, res) => {
   try {
-    const authors = await Author.find();
-    res.status(StatusCodes.OK).json(authors);
+    const { search = "", page = 1, limit = 5 } = req.query;
+    const skip = (page - 1) * limit;
+
+    console.log(search);
+    const query = search
+      ? {
+          name: { $regex: search, $options: "i" },
+        }
+      : {};
+
+    const [totalDocuments, authors] = await Promise.all([
+      Author.countDocuments(query),
+      Author.find(query).limit(limit).skip(skip),
+    ]);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    // console.log(page, totalPages);
+
+    if (page < 1 || page > totalPages)
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Khong tim thay tac gia ban muon",
+      });
+
+    res
+      .status(StatusCodes.OK)
+      .json({ authors, totalPages, currentPage: page, totalDocuments });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -62,6 +87,8 @@ const updateAuthor = async (req, res) => {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Tác giả không tồn tại" });
 
+    console.log(updatedAuthor);
+
     res.status(StatusCodes.OK).json(updatedAuthor);
   } catch (error) {
     res
@@ -87,6 +114,7 @@ const deleteAuthor = async (req, res) => {
 };
 
 export const authorController = {
+  getAllAuthors,
   getAuthorById,
   createAuthor,
   updateAuthor,
