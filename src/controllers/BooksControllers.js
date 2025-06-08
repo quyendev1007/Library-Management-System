@@ -9,43 +9,41 @@ export const getAllBooks = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const totalPages = await Book.countDocuments();
+    const query = search
+      ? {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { category: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
 
-    const pages = Math.ceil(totalPages / limit);
+    // Chạy song song count và find
+    const [totalDocuments, books] = await Promise.all([
+      Book.countDocuments(query),
+      Book.find(query).limit(limit).skip(skip),
+    ]);
 
-    if (totalPages === 0) {
+    if (totalDocuments === 0) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Không có sách nào trong cơ sở dữ liệu" });
     }
 
-    if (page < 1 || page > pages) {
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    if (page < 1 || page > totalPages) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Trang không hợp lệ" });
     }
 
-    let books;
-
-    if (search) {
-      books = await Book.find({
-        $or: [
-          { title: { $regex: search, $options: "i" } },
-          { category: { $regex: search, $options: "i" } },
-        ],
-      });
-      if (books.length === 0) {
-        return res
-          .status(StatusCodes.NOT_FOUND)
-          .json({ message: "Không tìm thấy sách" });
-      }
-    } else {
-      books = await Book.find().limit(limit).skip(skip);
-    }
-
-    books.pages = pages;
-
-    res.status(StatusCodes.OK).json(books);
+    res.status(StatusCodes.OK).json({
+      books,
+      totalPages,
+      currentPage: page,
+      totalDocuments,
+    });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
