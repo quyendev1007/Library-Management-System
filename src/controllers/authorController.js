@@ -3,10 +3,21 @@ import Author from "../models/author.js";
 
 const getAllAuthors = async (req, res) => {
   try {
-    const { search = "", page = 1, limit = 5 } = req.query;
+    const {
+      search = "",
+      page = 1,
+      limit = 5,
+      sortBy = "name",
+      order = "desc",
+    } = req.query;
     const skip = (page - 1) * limit;
 
-    console.log(search);
+    const sortOrder = order === "desc" ? -1 : 1;
+    const sortOptions = {};
+    if (sortBy === "name" || sortBy === "dateOfBirth") {
+      sortOptions[sortBy] = sortOrder;
+    }
+
     const query = search
       ? {
           name: { $regex: search, $options: "i" },
@@ -15,7 +26,7 @@ const getAllAuthors = async (req, res) => {
 
     const [totalDocuments, authors] = await Promise.all([
       Author.countDocuments(query),
-      Author.find(query).limit(limit).skip(skip),
+      Author.find(query).sort(sortOptions).limit(limit).skip(skip),
     ]);
 
     const totalPages = Math.ceil(totalDocuments / limit);

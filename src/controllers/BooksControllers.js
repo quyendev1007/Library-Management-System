@@ -3,11 +3,24 @@ import Book from "../models/books.js";
 
 export const getAllBooks = async (req, res) => {
   try {
-    const search = req.query.search || "";
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const {
+      search = "",
+      page = 1,
+      limit = 10,
+      sortBy = "title",
+      order = "desc",
+    } = req.query;
     const skip = (page - 1) * limit;
+
+    const sortOrder = order === "desc" ? -1 : 1;
+    const sortOptions = {};
+    if (
+      sortBy === "title" ||
+      sortBy === "createdAt" ||
+      sortBy === "publishedYear"
+    ) {
+      sortOptions[sortBy] = sortOrder;
+    }
 
     const query = search
       ? {
@@ -21,7 +34,7 @@ export const getAllBooks = async (req, res) => {
     // Chạy song song count và find
     const [totalDocuments, books] = await Promise.all([
       Book.countDocuments(query),
-      Book.find(query).limit(limit).skip(skip),
+      Book.find(query).sort(sortOptions).limit(limit).skip(skip),
     ]);
 
     if (totalDocuments === 0) {
@@ -35,7 +48,7 @@ export const getAllBooks = async (req, res) => {
     if (page < 1 || page > totalPages) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Trang không hợp lệ" });
+        .json({ message: "Khong co sach nao" });
     }
 
     res.status(StatusCodes.OK).json({
