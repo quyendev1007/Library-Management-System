@@ -48,6 +48,23 @@ const getAllAuthors = async (req, res) => {
   }
 };
 
+const getAll = async (req, res) => {
+  try {
+    const authors = await Author.find();
+
+    if (authors.length === 0)
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "khong co ban ghi nao",
+      });
+
+    res.status(StatusCodes.OK).json(authors);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Không có tác giả!", error: error.message });
+  }
+};
+
 const getAuthorById = async (req, res) => {
   try {
     const author = await Author.findById(req.params.id);
@@ -126,6 +143,7 @@ const deleteAuthor = async (req, res) => {
 
 export const authorController = {
   getAllAuthors,
+  getAll,
   getAuthorById,
   createAuthor,
   updateAuthor,
