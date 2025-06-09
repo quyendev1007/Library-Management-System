@@ -1,13 +1,47 @@
+import { StatusCodes } from "http-status-codes";
 import Publisher from "../models/publisher.js"; // Điều chỉnh path nếu cần
 
 // Hiển thị nhà xuất bản
 export const getAllPublishers = async (req, res) => {
   try {
-    const publishers = await Publisher.find();
-    res.status(200).json(publishers);
+    const {
+      search = "",
+      page = 1,
+      limit = 5,
+      sortBy = "name",
+      order = "desc",
+    } = req.query;
+    const skip = (page - 1) * limit;
+
+    const sortOrder = order === "desc" ? -1 : 1;
+
+    const sortOptions = {};
+    if (sortBy === "name") sortOptions[sortBy] = sortOrder;
+
+    const query = search
+      ? {
+          name: { $regex: search, $options: "i" },
+        }
+      : {};
+
+    const [totalDocuments, publishers] = await Promise.all([
+      Publisher.countDocuments(query),
+      Publisher.find(query).sort(sortOptions).limit(limit).skip(skip),
+    ]);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    if (page < 1 || page > totalPages)
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Khong tim thay nha xuat ban ban muon",
+      });
+
+    res
+      .status(StatusCodes.OK)
+      .json({ publishers, totalPages, currentPage: page, totalDocuments });
   } catch (error) {
     res
-      .status(500)
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: "Không có nhà xuất bản!", error: error.message });
   }
 };

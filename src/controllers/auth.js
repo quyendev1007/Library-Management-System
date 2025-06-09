@@ -116,7 +116,7 @@ export const refreshToken = async (req, res) => {
     const clientRefreshToken = req.cookies?.refreshToken;
 
     if (!clientRefreshToken) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         error: "Refresh token het han hoac khong ton tai",
       });
     }
@@ -140,11 +140,18 @@ export const refreshToken = async (req, res) => {
       process.env.ACCESS_TOKEN_LIFE
     );
 
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: ms("14 days"),
+      sameSite: "none",
+    });
+
     return res.status(StatusCodes.OK).json({
       accessToken: newAccessToken,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       error: "Lỗi khi làm mới token",
       message: error.message,
     });
