@@ -6,7 +6,7 @@ export const getAllBooks = async (req, res) => {
     const {
       search = "",
       page = 1,
-      limit = 10,
+      limit = 8,
       sortBy = "title",
       order = "desc",
     } = req.query;
@@ -16,7 +16,7 @@ export const getAllBooks = async (req, res) => {
     const sortOptions = {};
     if (
       sortBy === "title" ||
-      sortBy === "createdAt" ||
+      sortBy === "quantity" ||
       sortBy === "publishedYear"
     ) {
       sortOptions[sortBy] = sortOrder;
@@ -24,18 +24,22 @@ export const getAllBooks = async (req, res) => {
 
     const query = search
       ? {
-          $or: [
-            { title: { $regex: search, $options: "i" } },
-            { category: { $regex: search, $options: "i" } },
-          ],
+          title: { $regex: search, $options: "i" },
         }
       : {};
 
-    // Chạy song song count và find
     const [totalDocuments, books] = await Promise.all([
       Book.countDocuments(query),
-      Book.find(query).sort(sortOptions).limit(limit).skip(skip),
+      Book.find(query)
+        .populate("author")
+        .populate("publisher")
+        .populate("category")
+        .sort(sortOptions)
+        .limit(limit)
+        .skip(skip),
     ]);
+
+    console.log(books);
 
     if (totalDocuments === 0) {
       return res
@@ -83,9 +87,14 @@ export const getBookById = async (req, res) => {
 
 export const createBook = async (req, res) => {
   try {
-    const newBook = new Book(req.body);
-    await newBook.save();
-    res.status(StatusCodes.CREATED).json(newBook);
+    const newBook = await new Book(req.body).save();
+
+    const createdBook = await Book.findById(newBook._id)
+      .populate("author")
+      .populate("publisher")
+      .populate("category");
+
+    res.status(StatusCodes.CREATED).json(createdBook);
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -98,12 +107,16 @@ export const updateBook = async (req, res) => {
     const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
-    });
+    })
+      .populate("author")
+      .populate("publisher")
+      .populate("category");
 
     if (!updatedBook)
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Không tìm thấy sách" });
+
     res.status(StatusCodes.OK).json(updatedBook);
   } catch (error) {
     res

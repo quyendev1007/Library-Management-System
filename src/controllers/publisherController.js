@@ -45,7 +45,25 @@ export const getAllPublishers = async (req, res) => {
       .json({ message: "Không có nhà xuất bản!", error: error.message });
   }
 };
-// Hiển thị nhà xuất bản theo id
+
+export const getAll = async (req, res) => {
+  try {
+    console.log("object");
+    const publishers = await Publisher.find();
+
+    if (publishers.length === 0)
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "khong co ban ghi nao",
+      });
+
+    res.status(StatusCodes.OK).json(publishers);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Server error!", error: error.message });
+  }
+};
+
 export const getPublisherById = async (req, res) => {
   try {
     const publisher = await Publisher.findById(req.params.id);

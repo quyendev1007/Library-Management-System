@@ -12,6 +12,8 @@ authorRouter
   .get(authorController.getAllAuthors)
   .post(validateRequest(authorSchema), authorController.createAuthor);
 
+authorRouter.get("/all", authorController.getAll);
+
 authorRouter
   .route("/:id")
   .get(authorController.getAuthorById)

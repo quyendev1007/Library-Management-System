@@ -84,7 +84,7 @@ const updateUser = async (req, res) => {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Không tìm thấy người dùng!" });
     }
-    res.status(StatusCodes.OK).json(pickUser(updatedUser));
+    res.status(StatusCodes.OK).json(updatedUser);
   } catch (error) {
     res
       .status(StatusCodes.BAD_REQUEST)
