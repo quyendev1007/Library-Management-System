@@ -5,11 +5,11 @@ import Book from "../models/books.js";
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
-    res.status(200).json(categories);
+    res.status(StatusCodes.OK).json({ categories });
   } catch (error) {
     res
-      .status(500)
-      .json({ message: "Không có nhà xuất bản!", error: error.message });
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Không có danh mục!", error: error.message });
   }
 };
 
@@ -76,10 +76,13 @@ export const deleteCategoryAndUpdateBooks = async (req, res) => {
     const { id } = req.params;
     const category = await Category.findById(id);
     if (!category) {
-      return res.status(404).json({ message: "Không tìm thấy danh mục." });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Không tìm thấy danh mục." });
     }
 
     let defaultCategory = await Category.findOne({ name: "Chưa phân loại" });
+
     if (!defaultCategory) {
       defaultCategory = await Category.create({
         name: "Chưa phân loại",
@@ -91,13 +94,15 @@ export const deleteCategoryAndUpdateBooks = async (req, res) => {
       { category: id },
       { $set: { category: defaultCategory._id } }
     );
+
     await Category.findByIdAndDelete(id);
-    return res.status(200).json({
+
+    return res.status(StatusCodes.OK).json({
       message: `Đã xoá danh mục và cập nhật sách liên quan về "${defaultCategory.name}"`,
     });
   } catch (error) {
     return res
-      .status(500)
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: "Lỗi server", error: error.message });
   }
 };
