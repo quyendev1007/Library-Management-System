@@ -4,8 +4,51 @@ import { pickUser } from "../utils/formatters";
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
-    res.status(StatusCodes.OK).json(users);
+    const {
+      search = "",
+      page = 1,
+      limit = 5,
+      sortBy = "name",
+      order = "desc",
+    } = req.query;
+    const skip = (page - 1) * limit;
+
+    const sortOrder = order === "desc" ? -1 : 1;
+    const sortOptions = {};
+    if (sortBy === "name" || sortBy === "createdAt") {
+      sortOptions[sortBy] = sortOrder;
+    }
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+            { phone: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const [users, totalDocuments] = await Promise.all([
+      User.find(query)
+        .select("-password")
+        .sort(sortOptions)
+        .limit(limit)
+        .skip(skip),
+      User.countDocuments(query),
+    ]);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    if (page < 1 || page > totalPages) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Khong co user nao" });
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({ users, currentPage: page, totalPages, totalDocuments });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
