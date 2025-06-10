@@ -12,6 +12,8 @@ export const getAllBooks = async (req, res) => {
     } = req.query;
     const skip = (page - 1) * limit;
 
+    console.log(req.query);
+
     const sortOrder = order === "desc" ? -1 : 1;
     const sortOptions = {};
     if (
@@ -38,8 +40,6 @@ export const getAllBooks = async (req, res) => {
         .limit(limit)
         .skip(skip),
     ]);
-
-    console.log(books);
 
     if (totalDocuments === 0) {
       return res
@@ -70,14 +70,22 @@ export const getAllBooks = async (req, res) => {
 
 export const getBookById = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const bookDetails = await Book.findById(req.params.id)
+      .populate("author")
+      .populate("publisher")
+      .populate("category");
 
-    if (!book)
+    if (!bookDetails)
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Không tìm thấy sách" });
 
-    res.status(StatusCodes.OK).json(book);
+    const relatedBooks = await Book.find({
+      category: bookDetails.category,
+      _id: { $ne: bookDetails._id },
+    }).limit(4);
+
+    res.status(StatusCodes.OK).json({ bookDetails, relatedBooks });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
