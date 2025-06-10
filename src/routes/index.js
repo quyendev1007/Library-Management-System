@@ -6,6 +6,7 @@ import publisherRouter from "./publisher";
 import categoryRouter from "./category";
 import userRouter from "./user";
 import borrowRouter from "./borrow";
+import cartRouter from "./cart";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use("/publishers", publisherRouter);
 router.use("/categories", categoryRouter);
 router.use("/users", userRouter);
 router.use("/borrows", borrowRouter);
+router.use("/carts", cartRouter);
 
 export default router;
