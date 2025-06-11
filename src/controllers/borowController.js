@@ -100,18 +100,13 @@ export const getAllRequestBorrow = async (req, res) => {
 export const getUserRecords = async (req, res) => {
   try {
     const userId = req.jwtDecoded.id;
+
     const user = await User.findById(userId);
-    if (!user) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "Token không hợp lệ" });
-    }
 
     const userBorrowReq = await BorrowRecord.find({
-      userId: user._id,
+      user: user._id,
     }).populate({
-      path: "bookId",
-      select: "title category author publisher available ",
+      path: "book",
       populate: [
         { path: "category", select: "name -_id" },
         { path: "author", select: "name -_id" },

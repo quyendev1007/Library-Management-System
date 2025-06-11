@@ -2,8 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { verifyToken } from "../providers/jwtProvider";
 
 export const isAuthorized = async (req, res, next) => {
-  const clientAccessToken =
-    req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
+  const clientAccessToken = req.headers.authorization?.split(" ")[1];
 
   if (!clientAccessToken)
     return res
@@ -20,10 +19,12 @@ export const isAuthorized = async (req, res, next) => {
     next();
   } catch (err) {
     if (err?.message?.includes("jwt expired")) {
-      res.status(StatusCodes.GONE).json({ message: "Need to refresh token" });
+      return res
+        .status(StatusCodes.GONE)
+        .json({ message: "Need to refresh token" });
     }
 
-    res
+    return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: "Token không hợp lệ" });
   }

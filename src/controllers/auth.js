@@ -132,7 +132,12 @@ export const refreshToken = async (req, res) => {
       });
     }
 
-    const userInfo = isValid;
+    const userInfo = {
+      id: isValid.id,
+      name: isValid.name,
+      email: isValid.email,
+      role: isValid.role,
+    };
 
     const newAccessToken = await generateToken(
       userInfo,
