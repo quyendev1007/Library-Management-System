@@ -42,12 +42,28 @@ const createCart = async (req, res) => {
 
 const updateCartQuantity = async (req, res) => {
   try {
-    const updatedCart = await Cart.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    })
-      .populate("user")
-      .populate("book");
+    const { quantity } = req.query;
+
+    const cart = await Cart.findById(req.params.id);
+
+    if (quantity === "increase") {
+      if (cart.quantity >= 3) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ message: "Bạn chỉ có thể mượn tối đa 3 bản mỗi sách" });
+      }
+      cart.quantity += 1;
+    } else if (quantity === "decrease") {
+      cart.quantity = Math.max(1, cart.quantity - 1);
+    } else {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "URL không hợp lệ" });
+    }
+
+    await cart.save();
+
+    const updatedCart = await Cart.findById(cart._id).populate("book");
 
     res.status(StatusCodes.OK).json(updatedCart);
   } catch (error) {
@@ -59,12 +75,10 @@ const updateCartQuantity = async (req, res) => {
 
 const deleteCart = async (req, res) => {
   try {
-    const { ids } = req.body;
-
-    await Cart.deleteMany({ _id: { $in: ids } });
+    await Cart.findByIdAndDelete(req.params.id);
 
     res.status(StatusCodes.OK).json({
-      message: "Xóa thành công các mục đã chọn",
+      message: "Xóa thành công",
     });
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

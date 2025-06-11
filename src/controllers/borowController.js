@@ -2,57 +2,72 @@ import { StatusCodes } from "http-status-codes";
 import { User } from "../models/user";
 import Book from "../models/books";
 import BorrowRecord from "../models/borrowRecord";
+import { Cart } from "../models/cart";
 
 export const requestBorrow = async (req, res) => {
   try {
-    const { bookId } = req.params;
-    const userId = req.jwtDecoded.id;
-    const { dueDate } = req.body;
+    // sử dụng transaction để tối ưu code (hoi chatGPT :D )
 
-    console.log(userId);
+    const userId = req.jwtDecoded.id;
+    const { booksBorrow } = req.body;
+
     const user = await User.findById(userId);
     if (!user) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "Token không hợp lệ" });
+        .json({ message: "Nguoi dung không hợp lệ" });
     }
 
-    const book = await Book.findById(bookId);
-    if (!book) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Sách không tồn tại" });
+    let queryInsert = [];
+
+    let bookIdToDeleteInCart = [];
+
+    for (const book of booksBorrow) {
+      const [bookFind, existingBorrow] = await Promise.all([
+        Book.findById(book.book),
+        BorrowRecord.findOne({
+          book: book.book,
+          status: { $ne: "returned" },
+        }),
+      ]);
+
+      if (!bookFind) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ message: "Sách không tồn tại" });
+      }
+
+      if (bookFind.available < book.quantity) {
+        return res
+          .status(StatusCodes.NOT_ACCEPTABLE)
+          .json({ message: "Sách không khả dụng" });
+      }
+
+      if (existingBorrow) {
+        return res
+          .status(StatusCodes.NOT_ACCEPTABLE)
+          .json({ message: "Có sách bạn đã mượn mà chưa trả" });
+      }
+
+      bookFind.available -= book.quantity;
+      await bookFind.save();
+
+      queryInsert.push({ ...book, user: userId });
+      bookIdToDeleteInCart.push(book.book);
     }
 
-    if (book.available <= 0) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Sách này đã hết" });
-    }
-    const newAvailable = book.available - 1;
+    const createdBorrowRecords = await BorrowRecord.insertMany(queryInsert);
 
-    const existingBorrow = await BorrowRecord.findOne({
-      userId: user._id,
-      bookId: book._id,
-      status: "borrowed",
+    // xóa bản trong cart
+    await Cart.deleteMany({
+      user: userId,
+      book: { $in: bookIdToDeleteInCart },
     });
 
-    if (existingBorrow) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Bạn đã mượn sách này và chưa trả",
-      });
-    }
-    const borrowed = await BorrowRecord.create({
-      userId: user._id,
-      bookId: book._id,
-      dueDate,
+    return res.status(StatusCodes.CREATED).json({
+      message: "Mượn sách thành công",
+      borrowRecords: createdBorrowRecords,
     });
-
-    await Book.updateOne({ _id: bookId }, { available: newAvailable });
-
-    return res
-      .status(StatusCodes.CREATED)
-      .json({ message: "Mượn sách thành công", borrowed });
   } catch (error) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)

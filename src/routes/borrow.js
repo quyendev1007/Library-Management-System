@@ -10,6 +10,6 @@ const borrowRouter = express.Router();
 borrowRouter.get("/", getAllRequestBorrow);
 
 // borrowRouter.use(isValidPermission("client"));
-borrowRouter.post("/:bookId/", isAuthorized, requestBorrow);
+borrowRouter.post("/", isAuthorized, requestBorrow);
 
 export default borrowRouter;
