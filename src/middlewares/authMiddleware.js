@@ -2,8 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import { verifyToken } from "../providers/jwtProvider";
 
 export const isAuthorized = async (req, res, next) => {
-  // const token = req.headers.authorization?.split(" ")[1];
-
   const clientAccessToken =
     req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
 

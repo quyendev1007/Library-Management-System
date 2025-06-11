@@ -7,9 +7,8 @@ const cartRouter = Router();
 cartRouter
   .route("/:id")
   .get(CartController.getAllCardsByUserId)
-  .patch(CartController.updateCartQuantity);
-
-cartRouter.route("/").delete(CartController.deleteCart);
+  .patch(CartController.updateCartQuantity)
+  .delete(CartController.deleteCart);
 
 cartRouter.route("/").post(CartController.createCart);
 

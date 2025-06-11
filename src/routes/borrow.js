@@ -14,9 +14,10 @@ borrowRouter.use(checkOverdue);
 // borrowRouter.use(isValidPermission(["admin"]));
 borrowRouter.get("/", getAllRequestBorrow);
 borrowRouter.put("/:id", updateRecordStatus);
+borrowRouter.post("/", isAuthorized, requestBorrow);
 
-// borrowRouter.use(isValidPermission(["client"]));
 borrowRouter.post("/:bookId/", isAuthorized, requestBorrow);
-borrowRouter.get("/user/:id", isAuthorized, getUserRecords);
+borrowRouter.get("/user/:id", isAuthorized, getUserRecords)
+
 
 export default borrowRouter;

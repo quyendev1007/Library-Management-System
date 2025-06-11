@@ -6,12 +6,16 @@ import { errorHandlingMiddleware } from "./middlewares/errorHandlingMiddleware.j
 import router from "./routes/index.js";
 import cors from "cors";
 import { corsOptions } from "./config/cors.js";
+import cookieParser from 'cookie-parser'
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
+
+// config cookie parser
+app.use(cookieParser())
 
 app.use(cors(corsOptions));
 

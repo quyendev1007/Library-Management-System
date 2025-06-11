@@ -2,16 +2,17 @@ import mongoose from "mongoose";
 
 const borrowRecordSchema = new mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    bookId: {
+    book: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Book",
       required: true,
     },
+    quantity: { type: Number, required: true },
     borrowDate: { type: Date, default: Date.now },
     dueDate: { type: Date, required: true },
     returnDate: Date,
