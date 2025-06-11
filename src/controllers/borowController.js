@@ -42,6 +42,14 @@ export const requestBorrow = async (req, res) => {
         message: "Bạn đã mượn sách này và chưa trả",
       });
     }
+    const dueDateValidate = new Date(dueDate);
+    const today = new Date();
+    if (dueDateValidate <= today) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Ngày trả phải sau ngày hiện tại" });
+    }
+
     const borrowed = await BorrowRecord.create({
       userId: user._id,
       bookId: book._id,
