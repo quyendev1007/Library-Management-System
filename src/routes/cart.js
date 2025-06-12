@@ -1,9 +1,10 @@
 import { CartController } from "../controllers/cartController";
 
 import { Router } from "express";
+import { isAuthorized } from "../middlewares/authMiddleware";
 
 const cartRouter = Router();
-
+cartRouter.use(isAuthorized);
 cartRouter
   .route("/:id")
   .get(CartController.getAllCardsByUserId)

@@ -6,8 +6,6 @@ import { Cart } from "../models/cart";
 
 export const requestBorrow = async (req, res) => {
   try {
-    // sử dụng transaction để tối ưu code (hoi chatGPT :D )
-
     const userId = req.jwtDecoded.id;
     const { booksBorrow } = req.body;
 
@@ -78,9 +76,9 @@ export const requestBorrow = async (req, res) => {
 export const getAllRequestBorrow = async (req, res) => {
   try {
     const borrowRecords = await BorrowRecord.find()
-      .populate("userId", "name email -_id")
+      .populate("user", "name email -_id")
       .populate({
-        path: "bookId",
+        path: "book",
         select: "title category author publisher available -_id",
         populate: [
           { path: "category", select: "name -_id" },
