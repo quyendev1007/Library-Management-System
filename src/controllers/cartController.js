@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { Cart } from "../models/cart";
+import BorrowRecord from "../models/borrowRecord";
 
 const getAllCardsByUserId = async (req, res) => {
   try {
@@ -17,10 +18,21 @@ const getAllCardsByUserId = async (req, res) => {
 
 const createCart = async (req, res) => {
   try {
-    const { user, book } = req.body;
+    const { book } = req.body;
+    const userId = req.jwtDecoded.id;
 
-    const existingCartItem = await Cart.findOne({ user: user, book: book });
+    const borrowed = await BorrowRecord.findOne({
+      user: userId,
+      book,
+      status: { $ne: "returned" },
+    });
+    if (borrowed) {
+      return res
+        .status(StatusCodes.NOT_ACCEPTABLE)
+        .json({ message: "Sách này bạn mượn chưa trả" });
+    }
 
+    const existingCartItem = await Cart.findOne({ user: userId, book: book });
     if (existingCartItem) {
       if (existingCartItem.quantity < 3) {
         existingCartItem.quantity += 1;
