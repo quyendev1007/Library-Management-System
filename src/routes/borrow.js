@@ -10,14 +10,14 @@ import { isValidPermission } from "../middlewares/rbacMiddleware";
 import { checkOverdue } from "../middlewares/borrowMiddleware";
 
 const borrowRouter = express.Router();
-borrowRouter.use(checkOverdue);
+borrowRouter.use(checkOverdue).use(isAuthorized);
 // borrowRouter.use(isValidPermission(["admin"]));
 
 borrowRouter.get("/", getAllRequestBorrow);
 borrowRouter.put("/:id", updateRecordStatus);
 
 // borrowRouter.use(isValidPermission(["client"]));
-borrowRouter.post("/", isAuthorized, requestBorrow);
-borrowRouter.get("/user", isAuthorized, getUserRecords);
+borrowRouter.post("/", requestBorrow);
+borrowRouter.get("/user", getUserRecords);
 
 export default borrowRouter;
