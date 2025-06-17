@@ -17,7 +17,7 @@ bookRouter.get("/", getAllBooks);
 bookRouter.get("/:id", getBookById);
 
 // bookRouter.use(isAuthorized);
-// bookRouter.use(isValidPermission("admin"));
+// bookRouter.use(isValidPermission(["admin"]));
 // bookRouter.use(validateRequest(bookSchema));
 
 bookRouter.post("/", createBook);

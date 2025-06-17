@@ -15,14 +15,14 @@ export const getAllCategories = async (req, res) => {
 
 export const getCategoryById = async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
-
+    const category = await Category.findById(req.params.id).select("name");
     if (!category)
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Không tìm thấy danh mục" });
 
-    res.status(StatusCodes.OK).json(category);
+    const books = await Book.find({ category: category._id });
+    res.status(StatusCodes.OK).json({ ...category.toObject(), books });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
