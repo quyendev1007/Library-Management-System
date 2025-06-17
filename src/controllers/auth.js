@@ -113,9 +113,10 @@ export const logout = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    const clientRefreshToken = req.cookies?.refreshToken;
+    const clientRefreshToken = req.headers.refreshtoken;
 
     if (!clientRefreshToken) {
+      console.log("Refresh token het han hoac khong ton tai");
       return res.status(StatusCodes.UNAUTHORIZED).json({
         error: "Refresh token het han hoac khong ton tai",
       });
@@ -127,6 +128,7 @@ export const refreshToken = async (req, res) => {
     );
 
     if (!isValid) {
+      console.log("Refresh token khong hop le");
       return res.status(StatusCodes.UNAUTHORIZED).json({
         error: "Refresh token khong hop le",
       });

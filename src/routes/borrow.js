@@ -1,22 +1,24 @@
 import express from "express";
 import {
+  deleteBorrowRecord,
   getAllRequestBorrow,
   getUserRecords,
   requestBorrow,
   updateRecordStatus,
 } from "../controllers/borowController";
-import { isAuthorized } from "../middlewares/authMiddleware";
 import { isValidPermission } from "../middlewares/rbacMiddleware";
 import { checkOverdue } from "../middlewares/borrowMiddleware";
+import { isAuthorized } from "../middlewares/authMiddleware";
 
 const borrowRouter = express.Router();
-borrowRouter.use(checkOverdue).use(isAuthorized);
-// borrowRouter.use(isValidPermission(["admin"]));
 
-borrowRouter.get("/", getAllRequestBorrow);
-borrowRouter.put("/:id", updateRecordStatus);
+borrowRouter.use(isAuthorized);
 
-// borrowRouter.use(isValidPermission(["client"]));
+borrowRouter.get("/", isValidPermission(["admin"]), getAllRequestBorrow);
+borrowRouter.put("/:id", isValidPermission(["admin"]), updateRecordStatus);
+borrowRouter.delete("/:id", isValidPermission(["admin"]), deleteBorrowRecord);
+
+borrowRouter.use(isValidPermission(["client"]));
 borrowRouter.post("/", requestBorrow);
 borrowRouter.get("/user", getUserRecords);
 

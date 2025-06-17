@@ -8,7 +8,6 @@ import {
 } from "../controllers/auth";
 import { validateRequest } from "../middlewares/validateRequest";
 import { loginSchema, registerSchema } from "../validations/auth";
-import { isAuthorized } from "../middlewares/authMiddleware";
 import { isValidPermission } from "../middlewares/rbacMiddleware";
 
 const authRouter = Router();
@@ -21,8 +20,8 @@ authRouter.route("/logout").post(logout);
 
 authRouter.route("/refresh-token").post(refreshToken);
 
-authRouter
-  .route("/getCurrentUser")
-  .get(isAuthorized, isValidPermission(["admin"]), getCurrentUser);
+// authRouter
+//   .route("/getCurrentUser")
+//   .get(isAuthorized, isValidPermission(["admin"]), getCurrentUser);
 
 export default authRouter;

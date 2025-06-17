@@ -115,8 +115,6 @@ const updateAuthor = async (req, res) => {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Tác giả không tồn tại" });
 
-    console.log(updatedAuthor);
-
     res.status(StatusCodes.OK).json(updatedAuthor);
   } catch (error) {
     res
