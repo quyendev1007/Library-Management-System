@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import Author from "../models/author.js";
+import Book from "../models/books.js";
 
 const getAllAuthors = async (req, res) => {
   try {
@@ -125,13 +126,33 @@ const updateAuthor = async (req, res) => {
 
 const deleteAuthor = async (req, res) => {
   try {
-    const deleted = await Author.findByIdAndDelete(req.params.id);
-    if (!deleted)
+    const { id } = req.params;
+    const author = await Author.findById(id);
+    if (!author) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Tác giả không tồn tại" });
+        .json({ message: "Không tìm thấy tác giả." });
+    }
 
-    res.status(StatusCodes.OK).json({ message: "Xóa thành công" });
+    let defaultAuthor = await Author.findOne({ name: "Không rõ" });
+
+    if (!defaultAuthor) {
+      defaultAuthor = await Author.create({
+        name: "Không rõ",
+        bio: "Chưa có thông tin về tác giả của cuốn sách này đâu ạ",
+      });
+    }
+
+    await Book.updateMany(
+      { author: id },
+      { $set: { author: defaultAuthor._id } }
+    );
+
+    await Author.findByIdAndDelete(id);
+
+    return res.status(StatusCodes.OK).json({
+      message: "Đã xoá tác giả",
+    });
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)

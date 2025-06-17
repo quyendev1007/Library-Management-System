@@ -111,11 +111,32 @@ export const updatePublisher = async (req, res) => {
 // xóa nhà xuất bản
 export const deletePublisher = async (req, res) => {
   try {
-    const deletedPublisher = await Publisher.findByIdAndDelete(req.params.id);
-    if (!deletedPublisher) {
-      return res.status(404).json({ message: "Không tìm thấy nhà xuất bản!" });
+    const { id } = req.params;
+    const publisher = await Publisher.findById(id);
+    if (!publisher) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Không tìm thấy NXB." });
     }
-    res.status(200).json({ message: "Xóa Thành Công!" });
+
+    let defaultPublisher = await Publisher.findOne({ name: "Không rõ" });
+
+    if (!defaultPublisher) {
+      defaultPublisher = await Publisher.create({
+        name: "Không rõ",
+      });
+    }
+
+    await Book.updateMany(
+      { publisher: id },
+      { $set: { publisher: defaultPublisher._id } }
+    );
+
+    await Publisher.findByIdAndDelete(id);
+
+    return res.status(StatusCodes.OK).json({
+      message: "Đã xoá NXB",
+    });
   } catch (error) {
     res.status(500).json({ message: "Delete thất bại!", error: error.message });
   }

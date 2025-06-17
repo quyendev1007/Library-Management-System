@@ -21,6 +21,20 @@ const borrowRecordSchema = new mongoose.Schema(
       enum: ["borrowed", "returned", "overdue"],
       default: "borrowed",
     },
+    bookSnapshot: {
+      title: String,
+      image: [String],
+      description: String,
+      author: String,
+      publisher: String,
+      category: String,
+      quantity: Number,
+      available: Number,
+      publishedYear: Number,
+    },
+    userSnapshot: {
+      name: String,
+    },
   },
   {
     timestamps: true,
