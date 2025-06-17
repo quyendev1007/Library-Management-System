@@ -6,19 +6,18 @@ import {
   updateCategory,
   getAllCategories,
 } from "../controllers/categoryController";
-import { isAuthorized } from "../middlewares/authMiddleware";
 import { validateRequest } from "../middlewares/validateRequest";
 import { categorySchema } from "../validations/categoryValidation";
+import { isAuthorized } from "../middlewares/authMiddleware";
+import { isValidPermission } from "../middlewares/rbacMiddleware";
 
 const categoryRouter = express.Router();
 
-// categoryRouter.use(isValidPermission(["client"]));
 categoryRouter.get("/", getAllCategories);
 categoryRouter.get("/:id", getCategoryById);
 
-// categoryRouter.use(isValidPermission(["admin"]));
-categoryRouter.use(isAuthorized).use(validateRequest(categorySchema));
-categoryRouter.post("/", createCategory);
+categoryRouter.use(isAuthorized, isValidPermission(["admin"]));
+categoryRouter.post("/", validateRequest(categorySchema), createCategory);
 categoryRouter.put("/:id", updateCategory);
 categoryRouter.delete("/:id", deleteCategoryAndUpdateBooks);
 

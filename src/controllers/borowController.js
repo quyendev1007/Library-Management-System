@@ -9,6 +9,8 @@ export const requestBorrow = async (req, res) => {
     const userId = req.jwtDecoded.id;
     const { booksBorrow } = req.body;
 
+    console.log(userId, booksBorrow);
+
     const user = await User.findById(userId);
     if (!user) {
       return res
@@ -24,6 +26,7 @@ export const requestBorrow = async (req, res) => {
       const [bookFind, existingBorrow] = await Promise.all([
         Book.findById(book.book),
         BorrowRecord.findOne({
+          user: userId,
           book: book.book,
           status: { $ne: "returned" },
         }),
@@ -75,19 +78,45 @@ export const requestBorrow = async (req, res) => {
 
 export const getAllRequestBorrow = async (req, res) => {
   try {
-    const borrowRecords = await BorrowRecord.find()
-      .populate("user", "name email -_id")
-      .populate({
-        path: "book",
-        select: "title category author publisher available -_id",
-        populate: [
-          { path: "category", select: "name -_id" },
-          { path: "author", select: "name -_id" },
-          { path: "publisher", select: "name -_id" },
-        ],
-      });
+    const {
+      search = "",
+      page = 1,
+      limit = 5,
+      sortBy = "createdAt",
+      order = "desc",
+    } = req.query;
+    const skip = (page - 1) * limit;
 
-    return res.status(StatusCodes.OK).json({ borrowRecords });
+    const sortOrder = order === "desc" ? -1 : 1;
+
+    const [matchedUsers, matchedBooks] = await Promise.all([
+      User.find({ name: { $regex: search, $options: "i" } }).select("_id"),
+      Book.find({ title: { $regex: search, $options: "i" } }).select("_id"),
+    ]);
+
+    const userIds = matchedUsers.map((u) => u._id);
+    const bookIds = matchedBooks.map((b) => b._id);
+
+    // Xây dựng điều kiện tìm kiếm
+    const filter = {
+      $or: [{ user: { $in: userIds } }, { book: { $in: bookIds } }],
+    };
+
+    const [borrowRecords, totalDocuments] = await Promise.all([
+      BorrowRecord.find(search ? filter : {})
+        .populate("user", "name email -_id")
+        .populate("book")
+        .sort({ [sortBy]: sortOrder })
+        .limit(limit)
+        .skip(skip),
+      BorrowRecord.countDocuments(),
+    ]);
+
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    return res
+      .status(StatusCodes.OK)
+      .json({ borrowRecords, currentPage: page, totalPages, totalDocuments });
   } catch (error) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -103,14 +132,16 @@ export const getUserRecords = async (req, res) => {
 
     const userBorrowReq = await BorrowRecord.find({
       user: user._id,
-    }).populate({
-      path: "book",
-      populate: [
-        { path: "category", select: "name -_id" },
-        { path: "author", select: "name -_id" },
-        { path: "publisher", select: "name -_id" },
-      ],
-    });
+    })
+      .populate({
+        path: "book",
+        populate: [
+          { path: "category", select: "name -_id" },
+          { path: "author", select: "name -_id" },
+          { path: "publisher", select: "name -_id" },
+        ],
+      })
+      .sort({ createdAt: -1 });
     if (!userBorrowReq)
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -140,23 +171,34 @@ export const updateRecordStatus = async (req, res) => {
         new: true,
         runValidators: true,
       }
-    ).populate("bookId");
+    );
 
     if (!record)
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "bản ghi không tồn tại" });
 
-    if (status === "returned" && record.bookId) {
-      await Book.findByIdAndUpdate(record.bookId._id, {
-        $inc: { available: 1 },
-      });
-    }
     return res
       .status(StatusCodes.OK)
       .json({ message: "Cập nhật trạng thái thành công", data: { record } });
   } catch (error) {
     res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
+
+export const deleteBorrowRecord = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await BorrowRecord.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: error.message });
   }

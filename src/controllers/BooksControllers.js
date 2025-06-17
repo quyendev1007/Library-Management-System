@@ -12,8 +12,6 @@ export const getAllBooks = async (req, res) => {
     } = req.query;
     const skip = (page - 1) * limit;
 
-    console.log(req.query);
-
     const sortOrder = order === "desc" ? -1 : 1;
     const sortOptions = {};
     if (
