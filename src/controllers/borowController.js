@@ -12,6 +12,7 @@ export const requestBorrow = async (req, res) => {
     console.log(userId, booksBorrow);
 
     const user = await User.findById(userId);
+    console.log(user);
     if (!user) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -69,6 +70,9 @@ export const requestBorrow = async (req, res) => {
         },
         userSnapshot: {
           name: user.name,
+          email: user.email,
+          phone: user.phone,
+          addresses: user.addresses,
         },
       });
       bookIdToDeleteInCart.push(book.book);

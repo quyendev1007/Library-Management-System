@@ -34,6 +34,9 @@ const borrowRecordSchema = new mongoose.Schema(
     },
     userSnapshot: {
       name: String,
+      email: String,
+      phone: String,
+      adresses: [String],
     },
   },
   {
