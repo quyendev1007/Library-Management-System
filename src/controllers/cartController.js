@@ -4,10 +4,23 @@ import BorrowRecord from "../models/borrowRecord";
 
 const getAllCardsByUserId = async (req, res) => {
   try {
-    const cardsByUserId = await Cart.find({ user: req.params.id }).populate(
-      "book"
-    );
-
+    const cardsByUserId = await Cart.find({ user: req.params.id }).populate({
+      path: "book",
+      populate: [
+        {
+          path: "author",
+          select: "name -_id",
+        },
+        {
+          path: "publisher",
+          select: "name -_id",
+        },
+        {
+          path: "category",
+          select: "name -_id",
+        },
+      ],
+    });
     res.status(StatusCodes.OK).json(cardsByUserId);
   } catch (error) {
     res
