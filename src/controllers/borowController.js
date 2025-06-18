@@ -3,6 +3,9 @@ import { User } from "../models/user";
 import Book from "../models/books";
 import BorrowRecord from "../models/borrowRecord";
 import { Cart } from "../models/cart";
+import Author from "../models/author";
+import Publisher from "../models/publisher";
+import Category from "../models/category";
 
 export const requestBorrow = async (req, res) => {
   try {
@@ -61,9 +64,11 @@ export const requestBorrow = async (req, res) => {
           title: bookFind.title,
           image: bookFind.image,
           description: bookFind.description,
-          author: bookFind.author,
-          publisher: bookFind.publisher,
-          category: bookFind.category,
+          author: await Author.findById(bookFind.author).select("name"),
+          publisher: await Publisher.findById(bookFind.publisher).select(
+            "name"
+          ),
+          category: await Category.findById(bookFind.category).select("name"),
           quantity: bookFind.quantity,
           available: bookFind.available,
           publishedYear: bookFind.publishedYear,
