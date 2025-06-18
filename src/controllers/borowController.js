@@ -12,6 +12,7 @@ export const requestBorrow = async (req, res) => {
     console.log(userId, booksBorrow);
 
     const user = await User.findById(userId);
+    console.log(user);
     if (!user) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -53,7 +54,27 @@ export const requestBorrow = async (req, res) => {
       bookFind.available -= book.quantity;
       await bookFind.save();
 
-      queryInsert.push({ ...book, user: userId });
+      queryInsert.push({
+        ...book,
+        user: userId,
+        bookSnapshot: {
+          title: bookFind.title,
+          image: bookFind.image,
+          description: bookFind.description,
+          author: bookFind.author,
+          publisher: bookFind.publisher,
+          category: bookFind.category,
+          quantity: bookFind.quantity,
+          available: bookFind.available,
+          publishedYear: bookFind.publishedYear,
+        },
+        userSnapshot: {
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          addresses: user.addresses,
+        },
+      });
       bookIdToDeleteInCart.push(book.book);
     }
 
@@ -142,7 +163,7 @@ export const getUserRecords = async (req, res) => {
         ],
       })
       .sort({ createdAt: -1 });
-    if (!userBorrowReq)
+    if (!userBorrowReq || userBorrowReq.length === 0)
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Bạn chưa mượn cuốn sách nào" });

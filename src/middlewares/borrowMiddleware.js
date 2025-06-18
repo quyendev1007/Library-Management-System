@@ -6,7 +6,7 @@ export const checkOverdue = async (req, res, next) => {
     await BorrowRecord.updateMany(
       {
         status: "borrowed",
-        dueDate: { $lt: now },
+        dueDate: { $lte: now },
       },
       { status: "overdue" }
     );
