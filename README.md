@@ -16,28 +16,6 @@ Joi – xác thực dữ liệu đầu vào
 npm install
 npm run dev
 
-📁 Cấu trúc thư mục
-
-routes/
-│   ├── index.js           # File chính chứa các route tổng
-│   ├── book.js            # Route sách
-│   ├── user.js            # Route người dùng
-│   └── ...
-controllers/
-│   └── BooksControllers.js
-middlewares/
-│   ├── authMiddleware.js
-│   ├── rbacMiddleware.js
-│   └── validateRequest.js
-validations/
-│   └── bookValidation.js
-🔐 Xác thực & Phân quyền
-Một số endpoint yêu cầu:
-
-Xác thực JWT (isAuthorized)
-
-Phân quyền theo vai trò (ví dụ: ["admin"])
-
 📦 API Endpoints
 📘 Books
 Base URL: /books
